@@ -27,7 +27,7 @@ Open http://localhost:5000.
 ## What it does
 
 - Processes `refund-console-data/orders.csv` and `events.jsonl` to derive per-order refund state (succeeded, failed, pending) and refundable amount.
-- Shows a queue view and order detail view with refund timeline and derived totals.
+- Shows a queue view with search and simple filters, plus an order detail view with refund timeline and derived totals.
 - Allows recording an `approve`/`reject` action for pending refunds; decisions are saved to `data/decisions.json`.
 
 ## API checks

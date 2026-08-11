@@ -11,6 +11,18 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 state = load_state()
 
+
+def order_status(order):
+    if order['pending_minor'] > 0:
+        return 'pending'
+    if order['refunded_minor'] > 0 and order['failed_minor'] > 0:
+        return 'mixed'
+    if order['refunded_minor'] > 0:
+        return 'refunded'
+    if order['failed_minor'] > 0:
+        return 'failed'
+    return 'none'
+
 def load_decisions():
     if not os.path.exists(DECISIONS_PATH):
         return {}
@@ -23,12 +35,42 @@ def save_decisions(d):
 
 @app.route('/')
 def index():
-    orders = list(state['orders'].values())
+    query = (request.args.get('q') or '').strip().lower()
+    status_filter = (request.args.get('status') or 'all').strip().lower()
+    currency_filter = (request.args.get('currency') or 'all').strip().upper()
+
+    orders = []
+    for order in state['orders'].values():
+        status = order_status(order)
+        if query and query not in order['order_id'].lower() and query not in order['customer_id'].lower():
+            continue
+        if status_filter != 'all' and status != status_filter:
+            continue
+        if currency_filter != 'ALL' and order['currency'] != currency_filter:
+            continue
+
+        order_copy = dict(order)
+        order_copy['status'] = status
+        orders.append(order_copy)
+
+    orders.sort(key=lambda item: (item['pending_minor'] == 0, item['order_id']))
+
+    currencies = sorted({order['currency'] for order in state['orders'].values()})
     pending_totals = {}
     for cur, minor in state['totals']['pending'].items():
         pending_totals[cur] = minor / 100.0
     decisions = load_decisions()
-    return render_template('index.html', orders=orders, pending_totals=pending_totals, now=PINNED_NOW.isoformat(), decisions=decisions)
+    return render_template(
+        'index.html',
+        orders=orders,
+        pending_totals=pending_totals,
+        now=PINNED_NOW.isoformat(),
+        decisions=decisions,
+        query=query,
+        status_filter=status_filter,
+        currency_filter=currency_filter,
+        currencies=currencies,
+    )
 
 @app.route('/orders/<order_id>')
 def order_detail(order_id):

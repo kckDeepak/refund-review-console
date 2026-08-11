@@ -24,12 +24,131 @@
       <li>{{cur}}: {{"%.2f"|format(amt)}}</li>
       {% endfor %}
     </ul>
+    <form
+      method="get"
+      style="
+        margin: 16px 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: end;
+      "
+    >
+      <label style="display: flex; flex-direction: column; gap: 4px">
+        Search
+        <input
+          type="text"
+          name="q"
+          value="{{query}}"
+          placeholder="order or customer"
+        />
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px">
+        Status
+        <select name="status">
+          <option
+            value="all"
+            {%
+            if
+            status_filter=""
+            ="all"
+            %}selected{%
+            endif
+            %}
+          >
+            All
+          </option>
+          <option
+            value="pending"
+            {%
+            if
+            status_filter=""
+            ="pending"
+            %}selected{%
+            endif
+            %}
+          >
+            Pending
+          </option>
+          <option
+            value="refunded"
+            {%
+            if
+            status_filter=""
+            ="refunded"
+            %}selected{%
+            endif
+            %}
+          >
+            Refunded
+          </option>
+          <option
+            value="failed"
+            {%
+            if
+            status_filter=""
+            ="failed"
+            %}selected{%
+            endif
+            %}
+          >
+            Failed
+          </option>
+          <option
+            value="mixed"
+            {%
+            if
+            status_filter=""
+            ="mixed"
+            %}selected{%
+            endif
+            %}
+          >
+            Mixed
+          </option>
+        </select>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px">
+        Currency
+        <select name="currency">
+          <option
+            value="all"
+            {%
+            if
+            currency_filter=""
+            ="ALL"
+            %}selected{%
+            endif
+            %}
+          >
+            All
+          </option>
+          {% for currency in currencies %}
+          <option
+            value="{{currency}}"
+            {%
+            if
+            currency_filter=""
+            ="currency"
+            %}selected{%
+            endif
+            %}
+          >
+            {{currency}}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="submit">Apply</button>
+      <a href="/" style="padding-bottom: 3px">Reset</a>
+    </form>
     <h2>Queue (orders)</h2>
     <table>
       <thead>
         <tr>
           <th>Order</th>
           <th>Customer</th>
+          <th>Status</th>
           <th>Total</th>
           <th>Refunded</th>
           <th>Pending</th>
@@ -42,6 +161,7 @@
         <tr>
           <td><a href="/orders/{{o.order_id}}">{{o.order_id}}</a></td>
           <td>{{o.customer_id}}</td>
+          <td>{{o.status}}</td>
           <td>{{"%.2f"|format(o.total_amount_minor/100.0) }} {{o.currency}}</td>
           <td>{{"%.2f"|format(o.refunded_minor/100.0)}}</td>
           <td>{{"%.2f"|format(o.pending_minor/100.0)}}</td>
