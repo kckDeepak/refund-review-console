@@ -2,6 +2,7 @@ import csv
 import json
 from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 from dateutil import parser, tz
 import os
 
@@ -16,12 +17,11 @@ def to_minor(amount, currency):
     if isinstance(amount, int):
         return amount
     if isinstance(amount, float):
-        return int(round(amount * 100))
-    s = str(amount)
-    if s.isdigit():
-        return int(s)
-    # decimal
-    return int(round(float(s) * 100))
+        amount = str(amount)
+    value = Decimal(str(amount).strip())
+    if value == value.to_integral_value():
+        return int(value)
+    return int((value * 100).quantize(Decimal('1'), rounding=ROUND_HALF_UP))
 
 def load_orders(path=None):
     path = path or os.path.join(DATA_DIR, 'orders.csv')
