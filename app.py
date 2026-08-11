@@ -11,6 +11,24 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 state = load_state()
 
+STATUS_PRIORITY = {
+    'pending': 0,
+    'mixed': 1,
+    'failed': 2,
+    'refunded': 3,
+    'none': 4,
+}
+
+SORT_COLUMNS = {
+    'order_id',
+    'customer_id',
+    'status',
+    'total',
+    'refunded',
+    'pending',
+    'refundable',
+}
+
 
 def order_status(order):
     if order['pending_minor'] > 0:
@@ -22,6 +40,24 @@ def order_status(order):
     if order['failed_minor'] > 0:
         return 'failed'
     return 'none'
+
+
+def order_sort_value(order, sort_column):
+    if sort_column == 'order_id':
+        return order['order_id']
+    if sort_column == 'customer_id':
+        return order['customer_id']
+    if sort_column == 'status':
+        return STATUS_PRIORITY.get(order['status'], 99)
+    if sort_column == 'total':
+        return order['total_amount_minor']
+    if sort_column == 'refunded':
+        return order['refunded_minor']
+    if sort_column == 'pending':
+        return order['pending_minor']
+    if sort_column == 'refundable':
+        return order['refundable_minor']
+    return order['pending_minor']
 
 def load_decisions():
     if not os.path.exists(DECISIONS_PATH):
@@ -38,6 +74,13 @@ def index():
     query = (request.args.get('q') or '').strip().lower()
     status_filter = (request.args.get('status') or 'all').strip().lower()
     currency_filter = (request.args.get('currency') or 'all').strip().upper()
+    sort_column = (request.args.get('sort') or 'pending').strip().lower()
+    sort_direction = (request.args.get('dir') or 'desc').strip().lower()
+
+    if sort_column not in SORT_COLUMNS:
+        sort_column = 'pending'
+    if sort_direction not in ('asc', 'desc'):
+        sort_direction = 'desc'
 
     orders = []
     for order in state['orders'].values():
@@ -53,7 +96,8 @@ def index():
         order_copy['status'] = status
         orders.append(order_copy)
 
-    orders.sort(key=lambda item: (item['pending_minor'] == 0, item['order_id']))
+    reverse = sort_direction == 'desc'
+    orders.sort(key=lambda item: (order_sort_value(item, sort_column), item['order_id']), reverse=reverse)
 
     currencies = sorted({order['currency'] for order in state['orders'].values()})
     pending_totals = {}
@@ -70,6 +114,8 @@ def index():
         status_filter=status_filter,
         currency_filter=currency_filter,
         currencies=currencies,
+        sort_column=sort_column,
+        sort_direction=sort_direction,
     )
 
 @app.route('/orders/<order_id>')

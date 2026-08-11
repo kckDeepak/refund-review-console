@@ -71,16 +71,16 @@
             Pending
           </option>
           <option
-            value="refunded"
+            value="mixed"
             {%
             if
             status_filter=""
-            ="refunded"
+            ="mixed"
             %}selected{%
             endif
             %}
           >
-            Refunded
+            Mixed
           </option>
           <option
             value="failed"
@@ -95,16 +95,16 @@
             Failed
           </option>
           <option
-            value="mixed"
+            value="refunded"
             {%
             if
             status_filter=""
-            ="mixed"
+            ="refunded"
             %}selected{%
             endif
             %}
           >
-            Mixed
+            Refunded
           </option>
         </select>
       </label>
@@ -146,18 +146,67 @@
     <table>
       <thead>
         <tr>
-          <th>Order</th>
-          <th>Customer</th>
-          <th>Status</th>
-          <th>Total</th>
-          <th>Refunded</th>
-          <th>Pending</th>
-          <th>Refundable</th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='order_id', dir='asc' if sort_column == 'order_id' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Order{% if sort_column == 'order_id' %} {{ '▲' if sort_direction
+              == 'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='customer_id', dir='asc' if sort_column == 'customer_id' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Customer{% if sort_column == 'customer_id' %} {{ '▲' if
+              sort_direction == 'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='status', dir='asc' if sort_column == 'status' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Status{% if sort_column == 'status' %} {{ '▲' if sort_direction ==
+              'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='total', dir='asc' if sort_column == 'total' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Total{% if sort_column == 'total' %} {{ '▲' if sort_direction ==
+              'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='refunded', dir='asc' if sort_column == 'refunded' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Refunded{% if sort_column == 'refunded' %} {{ '▲' if
+              sort_direction == 'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='pending', dir='asc' if sort_column == 'pending' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Pending{% if sort_column == 'pending' %} {{ '▲' if sort_direction
+              == 'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a
+              href="{{ url_for('index', q=query, status=status_filter, currency=currency_filter, sort='refundable', dir='asc' if sort_column == 'refundable' and sort_direction == 'desc' else 'desc') }}"
+            >
+              Refundable{% if sort_column == 'refundable' %} {{ '▲' if
+              sort_direction == 'asc' else '▼' }}{% endif %}
+            </a>
+          </th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {% for o in orders %}
+        {% if orders %} {% for o in orders %}
         <tr>
           <td><a href="/orders/{{o.order_id}}">{{o.order_id}}</a></td>
           <td>{{o.customer_id}}</td>
@@ -168,7 +217,11 @@
           <td>{{"%.2f"|format(o.refundable_minor/100.0)}}</td>
           <td><a href="/orders/{{o.order_id}}">Detail</a></td>
         </tr>
-        {% endfor %}
+        {% endfor %} {% else %}
+        <tr>
+          <td colspan="8">No matching orders.</td>
+        </tr>
+        {% endif %}
       </tbody>
     </table>
   </body>
