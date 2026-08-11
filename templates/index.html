@@ -55,97 +55,20 @@
       <label style="display: flex; flex-direction: column; gap: 4px">
         Status
         <select name="status">
-          <option
-            value="all"
-            {%
-            if
-            status_filter=""
-            ="all"
-            %}selected{%
-            endif
-            %}
-          >
-            All
-          </option>
-          <option
-            value="pending"
-            {%
-            if
-            status_filter=""
-            ="pending"
-            %}selected{%
-            endif
-            %}
-          >
-            Pending
-          </option>
-          <option
-            value="mixed"
-            {%
-            if
-            status_filter=""
-            ="mixed"
-            %}selected{%
-            endif
-            %}
-          >
-            Mixed
-          </option>
-          <option
-            value="failed"
-            {%
-            if
-            status_filter=""
-            ="failed"
-            %}selected{%
-            endif
-            %}
-          >
-            Failed
-          </option>
-          <option
-            value="refunded"
-            {%
-            if
-            status_filter=""
-            ="refunded"
-            %}selected{%
-            endif
-            %}
-          >
-            Refunded
-          </option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="mixed" {% if status_filter == 'mixed' %}selected{% endif %}>Mixed</option>
+          <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+          <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
         </select>
       </label>
 
       <label style="display: flex; flex-direction: column; gap: 4px">
         Currency
         <select name="currency">
-          <option
-            value="all"
-            {%
-            if
-            currency_filter=""
-            ="ALL"
-            %}selected{%
-            endif
-            %}
-          >
-            All
-          </option>
+          <option value="all" {% if currency_filter == 'ALL' %}selected{% endif %}>All</option>
           {% for currency in currencies %}
-          <option
-            value="{{ currency }}"
-            {%
-            if
-            currency_filter=""
-            ="currency"
-            %}selected{%
-            endif
-            %}
-          >
-            {{ currency }}
-          </option>
+          <option value="{{ currency }}" {% if currency_filter == currency %}selected{% endif %}>{{ currency }}</option>
           {% endfor %}
         </select>
       </label>
