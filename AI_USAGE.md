@@ -3,6 +3,7 @@
 ## Where AI helped most
 
 - Drafting the processor code that normalizes event shapes and timestamps; iterating on edge cases (legacy `amount` vs `amount_minor`).
+- Shaping the queue UX, including the search bar and the click-to-sort column headers, so the table stayed small but still usable.
 
 ## Where AI was wrong
 
@@ -18,3 +19,4 @@
 
 - Wrote `tests/test_processor.py` asserting known refunds (ord_1001 and ord_1009) match expected minor-unit totals from the sample data.
 - Exercised the live endpoints in Postman: `GET /`, `GET /orders/<order_id>`, and `POST /orders/<order_id>/action` with valid and invalid payloads to confirm the success, validation, and duplicate-record paths.
+- Checked the queue search and sorting controls in the browser by filtering orders and clicking the sortable headers to confirm the order changed as expected.

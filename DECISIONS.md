@@ -11,6 +11,8 @@ These are the judgement calls I made while turning the export into the console.
 - Per-order refundable amount = max(0, order_total - sum(succeeded)). Pending amounts are capped by refundable amount (can't pay out more than original order total).
 - Currency handling: totals are computed per-currency and shown that way; no FX conversions.
 - Actions: `approve`/`reject` are recorded durably to `data/decisions.json`. An action is idempotent-blocked (second attempt returns 409).
+- Queue UX: I added a compact search bar and server-side sortable columns so agents can filter and re-order the queue without changing the underlying refund logic.
+- Sorting behavior: sort is query-param driven and applied server-side to keep the implementation simple, reproducible, and easy to explain.
 
 ## What I left out
 
