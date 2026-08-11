@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Order {{order.order_id}}</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td,
+      th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/">← Back</a>
+    <h1>Order {{order.order_id}}</h1>
+    <p>Customer: {{order.customer_id}}</p>
+    <p>
+      Total: {{"%.2f"|format(order.total_amount_minor/100.0)}}
+      {{order.currency}}
+    </p>
+    <p>
+      Refunded: {{"%.2f"|format(order.refunded_minor/100.0)}} — Pending:
+      {{"%.2f"|format(order.pending_minor/100.0)}}
+    </p>
+
+    <h2>Refunds</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Refund ID</th>
+          <th>Status</th>
+          <th>Amount</th>
+          <th>Events</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in order.refunds %}
+        <tr>
+          <td>{{r.refund_id}}</td>
+          <td>{{r.status}}</td>
+          <td>{{"%.2f"|format((r.amount_minor or 0)/100.0)}}</td>
+          <td>
+            <ul>
+              {% for e in r.events %}
+              <li>{{e.type}} @ {{e.occurred_at}} (src={{e.source}})</li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td>
+            {% if r.status == 'requested' %}
+            <button
+              onclick="act('{{order.order_id}}','{{r.refund_id}}','approve')"
+            >
+              Approve
+            </button>
+            <button
+              onclick="act('{{order.order_id}}','{{r.refund_id}}','reject')"
+            >
+              Reject
+            </button>
+            {% else %} — {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <script>
+      async function act(orderId, refundId, action) {
+        const reason = prompt('Reason (optional)') || '';
+        const res = await fetch(`/orders/${orderId}/action`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refund_id: refundId, action, reason }),
+        });
+        const j = await res.json();
+        if (res.ok) location.reload();
+        else alert(JSON.stringify(j));
+      }
+    </script>
+  </body>
+</html>

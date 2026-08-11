@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Refund Review Console</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td,
+      th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Refund Review Console</h1>
+    <p>Now: {{now}}</p>
+    <h2>Pending payout</h2>
+    <ul>
+      {% for cur, amt in pending_totals.items() %}
+      <li>{{cur}}: {{"%.2f"|format(amt)}}</li>
+      {% endfor %}
+    </ul>
+    <h2>Queue (orders)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Refunded</th>
+          <th>Pending</th>
+          <th>Refundable</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td><a href="/orders/{{o.order_id}}">{{o.order_id}}</a></td>
+          <td>{{o.customer_id}}</td>
+          <td>{{"%.2f"|format(o.total_amount_minor/100.0) }} {{o.currency}}</td>
+          <td>{{"%.2f"|format(o.refunded_minor/100.0)}}</td>
+          <td>{{"%.2f"|format(o.pending_minor/100.0)}}</td>
+          <td>{{"%.2f"|format(o.refundable_minor/100.0)}}</td>
+          <td><a href="/orders/{{o.order_id}}">Detail</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
