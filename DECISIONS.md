@@ -17,6 +17,7 @@ These are the judgement calls I made while turning the export into the console.
 - No authentication or role-based approval flows (would be required for production).
 - No background job / retry handling for newly arrived events — app reload needed to pick up new export files.
 - No ledger reconciliation or traceability links beyond events; for production we'd include event_ids in aggregates and expose CSV/trace exports for Priya.
+- Render deployment uses local filesystem storage for decisions, so decision history is not durable across redeploys. That is acceptable for the take-home, but a production version would need persistent storage.
 
 ## Queue interpretation
 

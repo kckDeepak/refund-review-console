@@ -24,6 +24,20 @@ python app.py
 
 Open http://localhost:5000.
 
+## Deploy on Render
+
+This repo includes a `render.yaml` that is ready for a Render web service.
+
+If you prefer to set it up manually in the Render dashboard, use:
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn app:app --bind 0.0.0.0:$PORT`
+
+Notes:
+
+- The app writes approval decisions to `data/decisions.json` on the local filesystem. That is fine for the assignment, but it is not durable storage on Render after a redeploy.
+- The core refund data comes from the committed CSV/JSONL files, so the deployed app is reproducible.
+
 ## What it does
 
 - Processes `refund-console-data/orders.csv` and `events.jsonl` to derive per-order refund state (succeeded, failed, pending) and refundable amount.
