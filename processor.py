@@ -13,14 +13,13 @@ ROOT = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT, 'refund-console-data')
 
 def to_minor(amount, currency):
-    # amount may be string decimal or numeric in minor units
-    if isinstance(amount, int):
-        return amount
+    # amounts in the feed are major-unit values like 1699.00, not already-minor values.
+    # Convert them to minor units consistently for all numeric inputs.
+    if amount is None:
+        return 0
     if isinstance(amount, float):
         amount = str(amount)
     value = Decimal(str(amount).strip())
-    if value == value.to_integral_value():
-        return int(value)
     return int((value * 100).quantize(Decimal('1'), rounding=ROUND_HALF_UP))
 
 def load_orders(path=None):
@@ -128,12 +127,14 @@ def derive_state(orders, events):
         rs = [r for r in refund_states.values() if any(ev.get('order_id') == oid for ev in r['events'])]
         rlist = []
         for r in rs:
-            a = r.get('amount_minor') or 0
+            a = r.get('amount_minor')
+            if a is None:
+                a = 0
             if r['status'] == 'succeeded':
                 succeeded += a
             elif r['status'] == 'failed':
                 failed += a
-            else:
+            elif a > 0:
                 pending += a
             rlist.append(r)
         refundable = max(0, order['total_amount_minor'] - succeeded)
